@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">source</string>
+    <string name="text">我是factory创建的textview</string>
+</resources>

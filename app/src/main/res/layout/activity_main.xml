@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:onClick="setSkin"
+        android:layout_width="@dimen/btn_width"
+        android:layout_height="@dimen/btn_height"
+        android:gravity="center"
+        android:background="@mipmap/timg"
+        android:layout_centerInParent="true"
+        android:textSize="@dimen/textsize"
+        android:textColor="@color/colorAccent"
+        android:text="@string/app_name"
+      />
+
+</RelativeLayout>
