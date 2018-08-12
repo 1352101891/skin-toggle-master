@@ -10,6 +10,8 @@ import com.skinlibrary.entity.ResourceBo;
 import com.skinlibrary.entity.SourceBo;
 import com.skinlibrary.skinManager.SkinResManager;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,11 +26,32 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AccessUtil {
+
+
+    public static void CopyAssetToPreference() {
+
+        try {
+
+            InputStream ins = SkinResManager.getInstance().getClass().getResourceAsStream(SkinResManager.getAssetsConfigPath());
+            Properties prop = new Properties();
+            prop.load(ins);
+            String str="";
+            str= prop.getProperty(constants.DEFAULTKEY);//文件里面配置的名
+            PreferencesUtils.putString(SkinResManager.getInstance().getApplication(),constants.DEFAULTKEY,str);
+            str= prop.getProperty(constants.SKINCONFIG);//文件里面配置的名
+            PreferencesUtils.putString(SkinResManager.getInstance().getApplication(),constants.SKINCONFIG,str);
+            ins.close();
+            ins.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void CopyAssetFile(SourceBo bo ) {
         String strCpSdPath = SkinResManager.getInstance().getCacheDir()+File.separator + bo.getName();
@@ -48,10 +71,11 @@ public class AccessUtil {
             myOutput.flush();
             myOutput.close();
             myInput.close();
+            bo.setPath(strCpSdPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        bo.setPath(strCpSdPath);
+
     }
 
 

@@ -6,6 +6,7 @@ import com.skinlibrary.callback.SkinLoadCallback;
 import com.skinlibrary.entity.ResourceBo;
 import com.skinlibrary.entity.SourceBo;
 import com.skinlibrary.util.AccessUtil;
+import com.skinlibrary.util.ConfigAccess;
 import com.skinlibrary.util.L;
 
 

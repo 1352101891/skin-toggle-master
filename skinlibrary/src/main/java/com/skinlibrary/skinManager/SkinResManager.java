@@ -9,31 +9,45 @@ import android.os.Environment;
 
 import android.util.Log;
 
+import com.skinlibrary.callback.AsyTaskCallback;
 import com.skinlibrary.callback.SkinLoadCallback;
+import com.skinlibrary.entity.ActionBo;
+import com.skinlibrary.util.PreferencesUtils;
+import com.skinlibrary.util.constants;
 import com.skinlibrary.entity.ResourceBo;
 import com.skinlibrary.entity.SourceBo;
+import com.skinlibrary.util.AccessUtil;
+import com.skinlibrary.util.AsyTaskUtil;
+import com.skinlibrary.util.ConfigAccess;
 import com.skinlibrary.util.L;
 import com.skinlibrary.util.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
+
 
 public class SkinResManager {
     private String TAG="SkinResManager";
     private String CacheDir="";
+    private final static String AssetsConfigPath="/assets/skin.properties";
+    private static String ScardConfigPath="";
     private WeakReference<Application> mApplication;
     private Map<String,ResourceBo> mapSources;
     private static SkinResManager Instance;
-    private static final String DEFAULTKEY="DEFAULT_SKIN";
+    private static final String DEFAULTKEY= constants.DEFAULTSKIN;
     private String currentKey="";
+    private String configName="skin.properties";
+    public static String getAssetsConfigPath() {
+        return AssetsConfigPath;
+    }
+
     private ResourceBo currentResource=null;
+    private static ArrayList<SourceBo> sourceBos=null;
 
     public static SkinResManager Init(Application application){
         if (Instance==null) {
@@ -59,6 +73,7 @@ public class SkinResManager {
         currentResource=new ResourceBo(resources,application.getApplicationInfo().packageName,null);
         currentKey=DEFAULTKEY;
         CacheDir= Environment.getExternalStorageDirectory()+ File.separator+application.getApplicationInfo().packageName;
+        ScardConfigPath=CacheDir+ File.separator+configName;
         createFolder();
         SkinResLoader.setCallback(new SkinLoadCallback() {
             @Override
@@ -77,6 +92,46 @@ public class SkinResManager {
                 apply(bo.getName());
             }
         });
+
+
+        AsyTaskUtil<SourceBo> taskUtil = new AsyTaskUtil<>(new AsyTaskCallback<SourceBo>() {
+            @Override
+            public void pre() {
+                L.e(TAG, "开始复制皮肤配置到sdcard");
+            }
+
+            @Override
+            public void doInBackground(SourceBo bo) {
+                if (PreferencesUtils.getInt(getApplication(),constants.STATUS,constants.FAILE)!=constants.OK) {
+                    AccessUtil.CopyAssetToPreference();
+                }
+                sourceBos = ConfigAccess.getAssetsSkinSourceBo();
+            }
+
+            @Override
+            public void end(SourceBo bo) {
+                PreferencesUtils.putInt(getApplication(), constants.STATUS, constants.OK);
+                L.e(TAG, "复制皮肤配置完成！,路径是：" + bo.getPath());
+            }
+        });
+        taskUtil.load(new SourceBo("skin.properties", AssetsConfigPath, null));
+
+    }
+
+
+    public static ArrayList<SourceBo> getSourceBos() {
+        return sourceBos;
+    }
+
+    public static SourceBo getSource(String name){
+        if (sourceBos!=null){
+            for (SourceBo bo:sourceBos) {
+                if (bo.getName().equals(name)){
+                    return bo;
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -153,10 +208,13 @@ public class SkinResManager {
                     ToastUtil.show("正在加载皮肤，请稍后！");
                 }
             }
+            ConfigAccess.setDefaultSKinConfig(bo);
         }else {
             ToastUtil.show("不存在该类型皮肤！");
         }
     }
+
+
 
 
     private synchronized void apply(String key){
@@ -165,12 +223,12 @@ public class SkinResManager {
                 currentKey = key;
                 currentResource = mapSources.get(currentKey);
             }else {
+                mapSources.remove(key);
                 return;
             }
         }
-        SourceBo bo=new SourceBo(currentKey,currentResource.getSourcePath(), SourceBo.TYPE.LOCAL);
-        EventBus.getDefault().post(bo);
-        Log.e(TAG,"发送皮肤广播:"+key);
+        EventBus.getDefault().post(new ActionBo());
+        Log.e(TAG,"应用皮肤资源的广播:"+key);
     }
 
     public int getColor(int resId) {
@@ -194,6 +252,13 @@ public class SkinResManager {
         return trueColor;
     }
 
+
+
+    public int getResourceID(String name) {
+        String[] resName =name.split("\\.");
+        int ID = getApplication().getResources().getIdentifier(resName[0], "drawable",  getApplication().getPackageName());
+        return ID;
+    }
 
     public Drawable getMipmap(int resId) {
 
@@ -293,4 +358,7 @@ public class SkinResManager {
         return Instance;
     }
 
+    public static String getScardConfigPath() {
+        return ScardConfigPath;
+    }
 }

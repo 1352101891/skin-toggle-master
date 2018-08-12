@@ -5,7 +5,9 @@ import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.skinlibrary.entity.ActionBo;
 import com.skinlibrary.entity.SourceBo;
+import com.skinlibrary.skinManager.SkinResManager;
 import com.skinlibrary.skinManager.SkinViewInflaterFactory;
 
 import org.greenrobot.eventbus.EventBus;
@@ -47,26 +49,35 @@ public  abstract  class SkinBaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-
     /**
-     * 如果参数是空的，默认皮肤
-     * @param sourceBo
+     * 请求加载皮肤资源，如果参数是空的，默认皮肤
+     * @param bo
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void apply(SourceBo sourceBo) {
+    public final void applySKinPlugin(SourceBo bo){
+        Log.e(TAG(),"正在设置皮肤！");
+        SkinResManager.getInstance().applySKinPlugin(bo);
+    }
+
+
+    /**
+     * 应用皮肤资源，
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final  void apply(ActionBo bo) {
         //应用皮肤
-        Log.e(TAG,"收到皮肤广播:"+sourceBo.getName());
+        Log.e(TAG,"收到应用皮肤资源的广播");
         mSkinInflaterFactory.applySkin();
     }
 
 
-    public String getSimpleClassName(){
+    public final String getSimpleClassName(){
         String name=this.getClass().getSimpleName();
         return name;
     }
 
 
-    public String TAG() {
+    public final String TAG() {
         return TAG;
     }
 

@@ -1,4 +1,4 @@
-package base;
+package base.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,7 +25,8 @@ public abstract class SkinBaseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView= getLayoutInflater().inflate(getResourceID(),container,false);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        InitViews();
+        return rootView;
     }
 
 
