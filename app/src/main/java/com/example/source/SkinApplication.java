@@ -19,7 +19,6 @@ public class SkinApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        SkinResManager.Init(this);
         app=this;
         CacheDir= Environment.getExternalStorageDirectory()+ File.separator+getApplicationInfo().packageName;
     }

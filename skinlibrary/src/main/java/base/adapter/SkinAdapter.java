@@ -94,8 +94,8 @@ public class SkinAdapter extends RecyclerView.Adapter<SkinViewHolder> {
     }
 
     public void findCheckPos(){
-        if (sourceBos!=null){
-            SourceBo temp=ConfigAccess.getDefaultSkin();
+        SourceBo temp=ConfigAccess.getDefaultSkin();
+        if (sourceBos!=null && temp!=null){
             for (int i=0;i<sourceBos.size();i++) {
                 if (sourceBos.get(i).getName().equals(temp.getName())){
                     checkPos=i;
